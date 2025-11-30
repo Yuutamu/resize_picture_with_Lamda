@@ -29,6 +29,49 @@ S3 (images/) → Lambda関数 → S3 (resized/)
 3. Lambda関数が画像をダウンロードしてリサイズ
 4. リサイズ済み画像を `resized/` フォルダに保存
 
+## 通信と処理の流れ（詳細図）
+
+```mermaid
+sequenceDiagram
+    participant User as ユーザー
+    participant S3Images as S3バケット<br/>(images/)
+    participant S3Event as S3イベント通知
+    participant Lambda as AWS Lambda<br/>サービス
+    participant Handler as lambda_function.rb<br/>(lambda_handler)
+    participant S3Resized as S3バケット<br/>(resized/)
+
+    Note over User,S3Images: 【ステップ1: トリガー】
+    User->>S3Images: 1. 画像をアップロード<br/>(例: photo.jpg)
+    S3Images-->>S3Images: 画像が保存される
+
+    Note over S3Images,Lambda: 【ステップ2-3: イベント通知とLambda起動】
+    S3Images->>S3Event: 2. 画像アップロードを検知
+    S3Event->>Lambda: 3. イベント通知を送信
+    Lambda->>Handler: 4. lambda_handler を呼び出し<br/>event: S3イベント情報（JSON）<br/>context: Lambda実行コンテキスト
+
+    Note over Handler: 【ステップ4-5: イベント解析】
+    Handler->>Handler: 5. extract_s3_event(event)<br/>バケット名: "my-bucket"<br/>オブジェクトキー: "images/photo.jpg"
+
+    Note over Handler,S3Images: 【ステップ6-7: 画像ダウンロード】
+    Handler->>Handler: 6. process_image() を呼び出し
+    Handler->>S3Images: 7. download_image()<br/>AWS SDK for S3 を使用
+    S3Images-->>Handler: 8. 画像データを返す<br/>(バイナリデータ)
+
+    Note over Handler: 【ステップ8-9: 画像リサイズ】
+    Handler->>Handler: 9. resize_image()<br/>MiniMagickでリサイズ<br/>- small: 200x200<br/>- medium: 800x800<br/>- large: 1200x1200
+
+    Note over Handler,S3Resized: 【ステップ10: リサイズ済み画像をアップロード】
+    loop 各サイズ (small, medium, large)
+        Handler->>S3Resized: 10. upload_resized_image()<br/>AWS SDK for S3 を使用
+        S3Resized-->>S3Resized: リサイズ済み画像を保存<br/>resized/small/photo.jpg<br/>resized/medium/photo.jpg<br/>resized/large/photo.jpg
+    end
+
+    Note over Handler,Lambda: 【ステップ11: 処理完了】
+    Handler->>Handler: 11. success_response() を返す
+    Handler-->>Lambda: 12. 実行結果を返す<br/>{ statusCode: 200, body: "完了" }
+    Lambda-->>S3Event: 13. 処理完了通知
+```
+
 ## コスト見積もり
 
 - **Lambda**: 100万リクエスト/月まで無料

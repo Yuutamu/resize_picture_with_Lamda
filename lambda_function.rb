@@ -33,14 +33,7 @@ end
 
 private
 
-# S3イベントから必要な情報を抽出
-# 
-# 【処理内容】
-# - event['Records'] の最初の要素を取得
-# - s3 データからバケット名とオブジェクトキーを取得
-# - オブジェクトキーはURLエンコードされているのでデコードする
-# - { bucket: "バケット名", key: "オブジェクトキー" } のハッシュを返す
-#
+# MEMO: S3イベントから必要な情報を抽出
 # 【S3イベントの構造例】
 # {
 #   "Records": [
@@ -53,7 +46,24 @@ private
 #   ]
 # }
 def extract_s3_event(event)
-  # TODO: S3イベントから情報を抽出する
+  raise "S3 Recordsが存在しません" if event['Records'].nil? || event['Records'].empty?
+  
+  record = event['Records'][0]
+
+  raise "S3 Recordが存在しません" if record.nil?
+  raise "S3 Record.S3 が存在しません" if record['s3'].nil?
+  raise "S3 Record.S3.Bucket が存在しません" if record['s3']['bucket'].nil?
+  raise "S3 Record.S3.Object が存在しません" if record['s3']['object'].nil?
+  
+  bucket_name = record['s3']['bucket']['name']
+  object_key = record['s3']['object']['key']
+  
+  # オブジェクトキーをURLデコード
+  require 'uri'
+  decoded_key = URI.decode_www_form_component(object_key)
+  
+  #TODO: 一旦、ハッシュを返す。後で調整する。
+  { bucket: bucket_name, key: decoded_key }
 end
 
 # 画像を処理するメイン関数

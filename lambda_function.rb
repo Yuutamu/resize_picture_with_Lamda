@@ -20,7 +20,6 @@ def lambda_handler(event:, context:)
       return success_response("スキップしました")
     end
     
-    # TODO: 画像を処理する関数を呼び出す
     process_image(bucket_name, object_key)
     
     success_response("画像のリサイズが完了しました")

@@ -13,3 +13,7 @@ gem 'mini_magick', '~> 4.12'
 
 # JSON処理（標準ライブラリだが、明示的に指定）
 # gem 'json' # Ruby標準ライブラリのため不要
+
+group :development do
+  gem 'rubocop', '~> 1.60'
+end

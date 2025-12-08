@@ -1,0 +1,110 @@
+# Rubocop設定ファイル
+
+# 対象とするRubyのバージョン
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: enable
+  Exclude:
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - '*.gemspec'
+
+# 行の長さの制限（コメントと文字列は除外）
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - '**/*.md'
+
+# メソッドの長さ
+Metrics/MethodLength:
+  Max: 30
+  Exclude:
+    - '**/*_spec.rb'
+
+# クラスの長さ
+Metrics/ClassLength:
+  Max: 200
+
+# ブロックの長さ
+Metrics/BlockLength:
+  Exclude:
+    - '**/*_spec.rb'
+    - '**/Rakefile'
+
+# 循環的複雑度
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+# メソッドの引数の数
+Metrics/ParameterLists:
+  Max: 5
+
+# 文字列リテラルのスタイル（シングルクォートを推奨）
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# ハッシュのスタイル
+Style/HashSyntax:
+  EnforcedStyle: ruby19
+
+# 末尾の空白を許可（Lambda環境での互換性のため）
+Layout/TrailingWhitespace:
+  Enabled: false
+
+# ファイル末尾の改行
+Layout/TrailingEmptyLines:
+  Enabled: true
+
+# インデントの一貫性
+Layout/IndentationConsistency:
+  EnforcedStyle: normal
+
+# インデントの幅
+Layout/IndentationWidth:
+  Width: 2
+
+# 空行のチェック
+Layout/EmptyLines:
+  Enabled: true
+
+# 空行の周りのチェック
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: true
+
+# 空行の周りのメソッド定義
+Layout/EmptyLinesAroundMethodBody:
+  Enabled: true
+
+# クラス定義の前の空行
+Layout/EmptyLinesAroundClassBody:
+  Enabled: true
+
+# モジュール定義の前の空行
+Layout/EmptyLinesAroundModuleBody:
+  Enabled: true
+
+# メソッド定義の前の空行
+Layout/EmptyLineBetweenDefs:
+  Enabled: true
+
+# コメントのスタイル
+Style/Documentation:
+  Enabled: false
+
+# マジックコメント（frozen_string_literal）の強制
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+# メソッド名の命名規則
+Naming/MethodName:
+  Enabled: true
+
+# 変数名の命名規則
+Naming/VariableName:
+  Enabled: true
+
+# 定数名の命名規則
+Naming/ConstantName:
+  Enabled: true
+

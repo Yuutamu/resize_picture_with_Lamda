@@ -66,14 +66,6 @@ def extract_s3_event(event)
   { bucket: bucket_name, key: decoded_key }
 end
 
-# 画像を処理するメイン関数
-# 
-# 【処理内容】
-# 1. S3クライアントを作成
-# 2. S3から画像をダウンロード
-# 3. 3つのサイズ（small, medium, large）にリサイズ
-# 4. リサイズ済み画像をS3にアップロード
-#
 # 【リサイズサイズ】
 # - small: 200x200px
 # - medium: 800x800px
@@ -91,10 +83,11 @@ def process_image(bucket_name, object_key)
     large: { width: 1200, height: 1200 }
   }
   
-  # TODO: 各サイズに対してループ処理
-  #   - 画像をリサイズ
-  #   - リサイズ済み画像をS3にアップロード
-  #   - ログ：「XXサイズのリサイズが完了」
+  sizes.each do |size_name, size_info|
+    resized_image = resize_image(image_data, size_info[:width], size_info[:height])
+    upload_resized_image(s3_client, bucket_name, object_key, size_name, resized_image)
+    puts "#{size_name}サイズのリサイズが完了"
+  end
 end
 
 def download_image(s3_client, bucket_name, object_key)

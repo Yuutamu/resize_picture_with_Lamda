@@ -5,11 +5,11 @@ require 'aws-sdk-s3'
 require 'mini_magick'
 
 # NOTE: Lambda関数のエントリーポイント, S3からのイベントを受け取ると実行される
-def lambda_handler(event:, context:)
+# NOTE: context はLambda実行環境の情報（実行時間、メモリなど） で、今回は使用しない
+def lambda_handler(event:, context: nil)
   puts "イベントを受信しました: #{event.to_json}"
 
   begin
-    # TODO: S3イベントから情報を抽出する関数
     s3_event = extract_s3_event(event)
     
     bucket_name = s3_event[:bucket]

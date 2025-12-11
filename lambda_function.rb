@@ -89,18 +89,21 @@ def process_image(bucket_name, object_key)
 end
 
 def download_image(s3_client, bucket_name, object_key)
-
   puts "画像をダウンロード中"
   # NOTE: S3からオブジェクトを取得 get_object AWS SDK for Ruby のメソッド
   response = s3_client.get_object(bucket: bucket_name, key: object_key)
 
-  return response.body.read
+  response.body.read
 end
 
-
+# MiniMagick のメソッドのドキュメントを参照 : https://www.rubydoc.info/gems/rmagick/Magick/Image#resize-instance_method:~:text=of%20the%20receiver.-,%23resize(cols%2C%20rows%2C%20filter%2C%20blur)%20%E2%87%92%20Magick%3A%3AImage,-Parameters%3A
+# 画像データから画像オブジェクトを作成し、最終的にバイナリデータに変換して返す
 def resize_image(image_data, width, height)
   puts "画像をリサイズ中: #{width}x#{height}"
-  # TODO:画像をリサイズ する処理を書く
+  
+  image = MiniMagick::Image.read(image_data)
+  image.resize "#{width}x#{height}^"
+  image.to_blob
 end
 
 def upload_resized_image(s3_client, bucket_name, original_key, size_name, image_data)

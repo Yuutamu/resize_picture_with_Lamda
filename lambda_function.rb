@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'aws-sdk-s3'
-require 'mini_magick'
+require "json"
+require "uri"
+require "aws-sdk-s3"
+require "mini_magick"
 
 # NOTE: Lambda関数のエントリーポイント, S3からのイベントを受け取ると実行される
 # NOTE: context はLambda実行環境の情報（実行時間、メモリなど） で、今回は使用しない
@@ -29,8 +30,6 @@ def lambda_handler(event:, context: nil)
     error_response("エラー: #{e.message}")
   end
 end
-
-private
 
 # MEMO: S3イベントから必要な情報を抽出
 # 【S3イベントの構造例】

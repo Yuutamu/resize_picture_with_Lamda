@@ -15,13 +15,14 @@ def lambda_handler(event:, context: nil)
     
     bucket_name = s3_event[:bucket]
     object_key = s3_event[:key]
+    aws_region = s3_event[:region]
     
     if object_key.include?("resized/")
       puts "リサイズ済み画像のためスキップ: #{object_key}"
       return success_response("スキップしました")
     end
     
-    process_image(bucket_name, object_key)
+    process_image(bucket_name, object_key, aws_region)
     
     success_response("画像のリサイズが完了しました")
   rescue StandardError => e
@@ -55,22 +56,22 @@ def extract_s3_event(event)
   
   bucket_name = record["s3"]["bucket"]["name"]
   object_key = record["s3"]["object"]["key"]
+  aws_region = record["awsRegion"] || ENV["AWS_REGION"] || "ap-northeast-1"
   
   # オブジェクトキーをURLデコード
   decoded_key = URI.decode_www_form_component(object_key)
   
-  # TODO: 一旦、ハッシュを返す。後で調整する。
-  { bucket: bucket_name, key: decoded_key }
+  { bucket: bucket_name, key: decoded_key, region: aws_region }
 end
 
 # 【リサイズサイズ】
 # - small: 200x200px
 # - medium: 800x800px
 # - large: 1200x1200px
-def process_image(bucket_name, object_key)
+def process_image(bucket_name, object_key, aws_region = nil)
   puts "画像を処理中"
   
-  s3_client = Aws::S3::Client.new
+  s3_client = Aws::S3::Client.new(region: aws_region || ENV["AWS_REGION"] || "ap-northeast-1")
   
   image_data = download_image(s3_client, bucket_name, object_key)
   

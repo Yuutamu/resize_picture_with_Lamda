@@ -107,7 +107,39 @@ def resize_image(image_data, width, height)
 end
 
 def upload_resized_image(s3_client, bucket_name, original_key, size_name, image_data)
-  # TODO:リサイズ済み画像をS3にアップロード する処理を書く
+  puts "リサイズ済み画像をアップロード中: #{size_name}"
+  
+  # 元のキーからファイル名を抽出
+  # 例: "images/photo.jpg" → "photo.jpg"
+  filename = File.basename(original_key)
+  
+  # リサイズ済み画像のキーを生成
+  # 例: "resized/small/photo.jpg"
+  resized_key = "resized/#{size_name}/#{filename}"
+  
+  # 元のキーから拡張子を取得してContent-Typeを決定
+  content_type = determine_content_type(original_key)
+  
+  # S3にアップロード
+  s3_client.put_object(
+    bucket: bucket_name,
+    key: resized_key,
+    body: image_data,
+    content_type: content_type
+  )
+  
+  puts "アップロード完了: #{resized_key}"
+end
+
+# ファイル拡張子からContent-Typeを決定
+def determine_content_type(key)
+  case File.extname(key).downcase
+  when ".png"
+    "image/png"
+  else
+    # .jpg, .jpeg およびその他の拡張子は image/jpeg を返す
+    "image/jpeg"
+  end
 end
 
 def success_response(message)

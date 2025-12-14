@@ -44,3 +44,4 @@ DEPLOY_GUIDE.md
 
 # テスト用ファイル
 test-event.json
+test_local.rb
